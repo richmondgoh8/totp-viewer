@@ -87,7 +87,7 @@
         .totp-display {
             background: rgba(15, 23, 42, 0.5);
             border-radius: 16px;
-            padding: 24px;
+            padding: 24px 24px 34px 24px;
             margin-bottom: 32px;
             border: 1px solid rgba(255, 255, 255, 0.05);
             position: relative;
@@ -101,6 +101,19 @@
             color: var(--text-main);
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
             font-variant-numeric: tabular-nums;
+        }
+
+        .timer-badge {
+            position: absolute;
+            bottom: 12px;
+            right: 16px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            padding: 2px 8px;
+            border-radius: 6px;
+            letter-spacing: 0.05em;
         }
 
         .progress-bar-container {
@@ -231,19 +244,25 @@
 
             <div class="totp-display" id="displayArea">
                 <div class="code" id="totpCode">------</div>
+                <div class="timer-badge"><span id="timerText">30</span>s remaining</div>
                 <div class="progress-bar-container">
                     <div class="progress-bar" id="progressBar"></div>
                 </div>
             </div>
 
             <div class="secret-input-group">
-                <label for="secret">Base32 Secret</label>
-                <input type="text" id="secret" placeholder="JBSWY3DPEHPK3PXP" autocomplete="off">
+                <label for="secret">Shared Secret (Bookmarkable)</label>
+                <input type="text" id="secret" readonly placeholder="Add ?secret= to URL" autocomplete="off">
+            </div>
+
+            <div id="noSecretPrompt" class="hidden" style="margin-bottom: 24px; color: var(--text-muted); font-size: 0.8rem; background: rgba(99, 102, 241, 0.1); padding: 12px; border-radius: 12px; border: 1px dashed var(--primary);">
+                ⚠️ <b>Secret Missing:</b> Please use a URL with a secret parameter, e.g.:<br>
+                <code id="exampleUrl" style="display: block; margin-top: 8px; color: var(--primary); cursor: pointer; text-decoration: underline;"></code>
             </div>
 
             <div class="actions">
-                <button class="btn-primary" id="generateBtn">Update Code</button>
-                <button class="btn-secondary" id="toggleValidatorBtn">Validate Code</button>
+                <button class="btn-primary hidden" id="generateBtn">Update Code</button>
+                <button class="btn-secondary" id="toggleValidatorBtn" style="grid-column: span 2;">Validate Code</button>
             </div>
 
             <div id="validatorSection" class="validator-section hidden">
@@ -265,6 +284,7 @@
         const secretInput = document.getElementById('secret');
         const totpCode = document.getElementById('totpCode');
         const progressBar = document.getElementById('progressBar');
+        const timerText = document.getElementById('timerText');
         const generateBtn = document.getElementById('generateBtn');
         const toggleValidatorBtn = document.getElementById('toggleValidatorBtn');
         const validatorSection = document.getElementById('validatorSection');
@@ -272,14 +292,20 @@
         const windowStepsInput = document.getElementById('windowSteps');
         const verifyBtn = document.getElementById('verifyBtn');
         const statusBadge = document.getElementById('statusBadge');
+        const noSecretPrompt = document.getElementById('noSecretPrompt');
+        const exampleUrl = document.getElementById('exampleUrl');
+        const displayArea = document.getElementById('displayArea');
 
         let refreshTimer = null;
 
         function updateProgress() {
             const now = new Date();
             const seconds = now.getSeconds() % 30;
-            const progress = ((30 - seconds) / 30) * 100;
+            const remaining = 30 - seconds;
+            const progress = (remaining / 30) * 100;
+            
             progressBar.style.width = progress + '%';
+            timerText.textContent = remaining;
             
             if (seconds === 0) {
                 fetchTotp();
@@ -291,7 +317,7 @@
             if (!secret) return;
 
             try {
-                const response = await fetch("/?secret=" + encodeURIComponent(secret), {
+                const response = await fetch("/?secret=" + encodeURIComponent(secret) + "&format=json", {
                     headers: { 'Accept': 'application/json' }
                 });
                 const data = await response.json();
@@ -310,7 +336,7 @@
             if (!secret || !code) return;
 
             try {
-                const response = await fetch("/validate?secret=" + encodeURIComponent(secret) + "&code=" + encodeURIComponent(code) + "&window=" + window, {
+                const response = await fetch("/validate?secret=" + encodeURIComponent(secret) + "&code=" + encodeURIComponent(code) + "&window=" + window + "&format=json", {
                     headers: { 'Accept': 'application/json' }
                 });
                 const data = await response.json();
@@ -344,11 +370,22 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const urlSecret = urlParams.get('secret');
+        
         if (urlSecret) {
             secretInput.value = urlSecret;
             fetchTotp();
             refreshTimer = setInterval(updateProgress, 1000);
             updateProgress();
+        } else {
+            // Show prompt if no secret in URL
+            noSecretPrompt.classList.remove('hidden');
+            displayArea.style.opacity = '0.3';
+            displayArea.style.pointerEvents = 'none';
+            
+            const currentUrl = window.location.href.split('?')[0];
+            const demoUrl = currentUrl + "?secret=JBSWY3DPEHPK3PXP";
+            exampleUrl.textContent = demoUrl;
+            exampleUrl.onclick = () => window.location.href = demoUrl;
         }
     </script>
 </body>
