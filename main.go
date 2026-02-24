@@ -452,7 +452,7 @@ const IndexHTML = `<!DOCTYPE html>
             </div>
 
             <div id="noSecretPrompt" class="hidden" style="margin-bottom: 24px; color: var(--text-muted); font-size: 0.8rem; background: rgba(99, 102, 241, 0.1); padding: 12px; border-radius: 12px; border: 1px dashed var(--primary);">
-                ⚠️ <b>Secret Missing:</b> Please use a URL with a secret parameter, e.g.:<br>
+                <b>Secret Missing:</b> Please use a URL with a secret parameter, e.g.:<br>
                 <code id="exampleUrl" style="display: block; margin-top: 8px; color: var(--primary); cursor: pointer; text-decoration: underline;"></code>
             </div>
 
@@ -528,7 +528,7 @@ const IndexHTML = `<!DOCTYPE html>
         async function verifyCode() {
             const secret = secretInput.value.trim();
             const code = validateCodeInput.value.trim();
-            const window = windowStepsInput.value.trim() || "1";
+            const window = windowStepsInput.value.trim() || '1';
             if (!secret || !code) return;
 
             try {
@@ -539,10 +539,10 @@ const IndexHTML = `<!DOCTYPE html>
                 
                 statusBadge.classList.remove('hidden', 'status-valid', 'status-invalid');
                 if (data.valid) {
-                    statusBadge.textContent = '✅ VERIFIED';
+                    statusBadge.textContent = 'VERIFIED';
                     statusBadge.classList.add('status-valid');
                 } else {
-                    statusBadge.textContent = '❌ INVALID CODE';
+                    statusBadge.textContent = 'INVALID CODE';
                     statusBadge.classList.add('status-invalid');
                 }
             } catch (err) {
@@ -587,8 +587,7 @@ const IndexHTML = `<!DOCTYPE html>
 </body>
 </html>`
 
-const IndexJS = `
-function base32ToUint8Array(base32) {
+const IndexJS = `function base32ToUint8Array(base32) {
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
     let bits = 0;
     let value = 0;
@@ -647,8 +646,9 @@ export async function onRequest(context) {
     const { request, next } = context;
     const url = new URL(request.url);
     const secret = url.searchParams.get('secret');
+    const isJSON = request.headers.get('Accept')?.includes('application/json') || url.searchParams.get('format') === 'json';
 
-    if (secret) {
+    if (secret && isJSON) {
         try {
             const totp = await generateTOTP(secret);
             return new Response(JSON.stringify({ totp }), {
@@ -665,8 +665,7 @@ export async function onRequest(context) {
 }
 `
 
-const ValidateJS = `
-function base32ToUint8Array(base32) {
+const ValidateJS = `function base32ToUint8Array(base32) {
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
     let bits = 0;
     let value = 0;
@@ -755,5 +754,4 @@ export async function onRequest(context) {
             headers: { 'Content-Type': 'application/json' }
         });
     }
-}
-`
+}`

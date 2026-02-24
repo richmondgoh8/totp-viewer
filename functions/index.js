@@ -1,4 +1,3 @@
-
 function base32ToUint8Array(base32) {
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
     let bits = 0;
@@ -58,8 +57,9 @@ export async function onRequest(context) {
     const { request, next } = context;
     const url = new URL(request.url);
     const secret = url.searchParams.get('secret');
+    const isJSON = request.headers.get('Accept')?.includes('application/json') || url.searchParams.get('format') === 'json';
 
-    if (secret) {
+    if (secret && isJSON) {
         try {
             const totp = await generateTOTP(secret);
             return new Response(JSON.stringify({ totp }), {

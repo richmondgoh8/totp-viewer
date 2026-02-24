@@ -1,4 +1,3 @@
-
 function base32ToUint8Array(base32) {
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
     let bits = 0;
