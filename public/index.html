@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,7 +42,7 @@
         body {
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg);
-            background-image: 
+            background-image:
                 radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
             color: var(--text-main);
@@ -318,14 +319,22 @@
             font-size: 0.75rem;
         }
 
-        .hidden { display: none; }
+        .hidden {
+            display: none;
+        }
 
         @media (max-width: 480px) {
-            .card { padding: 30px 20px; }
-            .code { font-size: 3rem; }
+            .card {
+                padding: 30px 20px;
+            }
+
+            .code {
+                font-size: 3rem;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="top-nav">
         <select id="langSelect" class="language-select">
@@ -347,7 +356,11 @@
                 <div class="code-container">
                     <div class="code" id="totpCode">------</div>
                     <button class="copy-btn" id="copyBtn" title="Copy to clipboard">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
                     </button>
                     <div class="copy-feedback" id="copyFeedback">COPIED</div>
                 </div>
@@ -362,17 +375,22 @@
                 <input type="text" id="secret" readonly placeholder="?secret= in URL" autocomplete="off">
             </div>
 
-            <div id="noSecretPrompt" class="hidden" style="margin-bottom: 24px; color: var(--text-muted); font-size: 0.8rem; background: var(--primary-glow); padding: 12px; border-radius: 12px; border: 1px dashed var(--primary);">
-                <b id="missingTxt">Secret Missing:</b> <span id="promptTxt">Please use a URL with a secret parameter, e.g.:</span><br>
-                <code id="exampleUrl" style="display: block; margin-top: 8px; color: var(--primary); cursor: pointer; text-decoration: underline;"></code>
+            <div id="noSecretPrompt" class="hidden"
+                style="margin-bottom: 24px; color: var(--text-muted); font-size: 0.8rem; background: var(--primary-glow); padding: 12px; border-radius: 12px; border: 1px dashed var(--primary);">
+                <b id="missingTxt">Secret Missing:</b> <span id="promptTxt">Please use a URL with a secret parameter,
+                    e.g.:</span><br>
+                <code id="exampleUrl"
+                    style="display: block; margin-top: 8px; color: var(--primary); cursor: pointer; text-decoration: underline;"></code>
             </div>
 
             <div class="actions">
                 <button class="btn-primary hidden" id="generateBtn">Update</button>
-                <button class="btn-secondary" id="toggleValidatorBtn" style="grid-column: span 2;">Validate Code</button>
+                <button class="btn-secondary" id="toggleValidatorBtn" style="grid-column: span 2;">Validate
+                    Code</button>
             </div>
 
-            <div id="validatorSection" class="validator-section hidden" style="margin-top:30px; border-top:1px solid var(--border); padding-top:20px;">
+            <div id="validatorSection" class="validator-section hidden"
+                style="margin-top:30px; border-top:1px solid var(--border); padding-top:20px;">
                 <div id="statusBadge" class="status-badge hidden"></div>
                 <div class="secret-input-group">
                     <label for="validateCode" id="labelVerify">Enter Code to Verify</label>
@@ -389,9 +407,14 @@
                 <div class="about-title">
                     <span>🛡️</span> <span id="aboutTitleText">About this Project</span>
                 </div>
-                <p id="aboutDescText">This is a ultra-secure, client-side TOTP viewer. Your secrets are processed only in your browser and never sent to any server. It supports bookmarkable URLs for quick access while maintaining a premium glassmorphic aesthetic.</p>
+                <p id="aboutDescText">This is a ultra-secure, client-side TOTP viewer. Your secrets are processed only
+                    in your browser and never sent to any server. It supports bookmarkable URLs for quick access while
+                    maintaining a premium glassmorphic aesthetic.</p>
                 <a href="https://github.com/richmondgoh8/totp-viewer" target="_blank" class="github-link">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                    </svg>
                     <span>GitHub</span>
                     <span class="star-box" id="starCount">24</span>
                 </a>
@@ -399,6 +422,7 @@
         </div>
     </div>
 
+    <script src="wasm_exec.js"></script>
     <script>
         const i18n = {
             en: {
@@ -529,36 +553,32 @@
         async function fetchTotp() {
             const secret = secretInput.value.trim();
             if (!secret) return;
-            try {
-                const response = await fetch("/?secret=" + encodeURIComponent(secret) + "&format=json", {
-                    headers: { 'Accept': 'application/json' }
-                });
-                const data = await response.json();
-                if (data.totp) totpCode.textContent = data.totp;
-            } catch (err) {
-                console.error('Failed to fetch TOTP', err);
+            // Now using Wasm-exported Go function
+            if (window.generateTOTPGo) {
+                const result = window.generateTOTPGo(secret);
+                if (result.totp) totpCode.textContent = result.totp;
+                else if (result.error) console.error('TOTP Error:', result.error);
             }
         }
 
         async function verifyCode() {
             const secret = secretInput.value.trim();
             const code = validateCodeInput.value.trim();
-            const window = windowStepsInput.value.trim() || '1';
+            const windowSteps = parseInt(windowStepsInput.value.trim() || '1');
             if (!secret || !code) return;
-            try {
-                const response = await fetch("/validate?secret=" + encodeURIComponent(secret) + "&code=" + encodeURIComponent(code) + "&window=" + window + "&format=json", {
-                    headers: { 'Accept': 'application/json' }
-                });
-                const data = await response.json();
+
+            // Now using Wasm-exported Go function
+            if (window.validateTOTPGo) {
+                const result = window.validateTOTPGo(secret, code, windowSteps);
                 statusBadge.classList.remove('hidden', 'status-valid', 'status-invalid');
-                if (data.valid) {
+                if (result.valid) {
                     statusBadge.textContent = i18n[currentLang].verified;
                     statusBadge.classList.add('status-valid');
                 } else {
                     statusBadge.textContent = i18n[currentLang].invalid;
                     statusBadge.classList.add('status-invalid');
                 }
-            } catch (err) { console.error('Failed to verify', err); }
+            }
         }
 
         langSelect.onchange = (e) => applyLanguage(e.target.value);
@@ -566,6 +586,30 @@
         copyBtn.onclick = copyToClipboard;
         document.getElementById('toggleValidatorBtn').onclick = () => validatorSection.classList.toggle('hidden');
         document.getElementById('verifyBtn').onclick = verifyCode;
+
+        // Wasm Initialization
+        const go = new Go();
+        WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
+            go.run(result.instance);
+            console.log("Wasm initialized");
+
+            // Initial fetch after Wasm is ready
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlSecret = urlParams.get('secret');
+            if (urlSecret) {
+                secretInput.value = urlSecret;
+                fetchTotp();
+                refreshTimer = setInterval(updateProgress, 1000);
+                updateProgress();
+            } else {
+                noSecretPrompt.classList.remove('hidden');
+                displayArea.style.opacity = '0.3';
+                displayArea.style.pointerEvents = 'none';
+                const demoUrl = window.location.href.split('?')[0] + "?secret=JBSWY3DPEHPK3PXP";
+                exampleUrl.textContent = demoUrl;
+                exampleUrl.onclick = () => window.location.href = demoUrl;
+            }
+        });
 
         // Init
         applyLanguage(currentLang);
@@ -575,29 +619,14 @@
             document.getElementById('themeText').textContent = 'Light';
         }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlSecret = urlParams.get('secret');
-        if (urlSecret) {
-            secretInput.value = urlSecret;
-            fetchTotp();
-            refreshTimer = setInterval(updateProgress, 1000);
-            updateProgress();
-        } else {
-            noSecretPrompt.classList.remove('hidden');
-            displayArea.style.opacity = '0.3';
-            displayArea.style.pointerEvents = 'none';
-            const demoUrl = window.location.href.split('?')[0] + "?secret=JBSWY3DPEHPK3PXP";
-            exampleUrl.textContent = demoUrl;
-            exampleUrl.onclick = () => window.location.href = demoUrl;
-        }
-
-        // Fetch Github stars (simulated/mock for now, or use real API)
+        // Fetch Github stars
         fetch('https://api.github.com/repos/richmondgoh8/totp-viewer')
             .then(res => res.json())
             .then(data => {
                 if (data.stargazers_count !== undefined)
                     document.getElementById('starCount').textContent = data.stargazers_count;
-            }).catch(() => {});
+            }).catch(() => { });
     </script>
 </body>
+
 </html>
