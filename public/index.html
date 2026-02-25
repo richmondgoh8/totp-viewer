@@ -299,7 +299,7 @@
         }
 
         .github-link,
-        .opencollective-link {
+        .bmc-link {
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -315,21 +315,20 @@
         }
 
         .github-link:hover,
-        .opencollective-link:hover {
+        .bmc-link:hover {
             transform: translateY(-2px);
             background: rgba(99, 102, 241, 0.25);
             border-color: var(--primary);
         }
 
-        .opencollective-link {
-            color: #ef4444;
-            /* Heart/Donation red */
-            background: rgba(239, 68, 68, 0.1);
+        .bmc-link {
+            color: #FFDD00;
+            background: rgba(255, 221, 0, 0.1);
         }
 
-        .opencollective-link:hover {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: #ef4444;
+        .bmc-link:hover {
+            background: rgba(255, 221, 0, 0.2);
+            border-color: #FFDD00;
         }
 
         .star-box {
@@ -431,7 +430,7 @@
                 <p id="aboutDescText">This is a ultra-secure, client-side TOTP viewer. Your secrets are processed only
                     in your browser and never sent to any server. It supports bookmarkable URLs for quick access while
                     maintaining a premium glassmorphic aesthetic.</p>
-                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
                     <a href="https://github.com/richmondgoh8/totp-viewer" target="_blank" class="github-link">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                             <path
@@ -440,22 +439,13 @@
                         <span>GitHub</span>
                         <span class="star-box" id="starCount">24</span>
                     </a>
-                    <a href="https://opencollective.com/totp-viewer" target="_blank" class="opencollective-link">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <a href="https://buymeacoffee.com/richmondgoh" target="_blank" class="bmc-link">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                             <path
-                                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
-                            </path>
+                                d="M20.216 6.415l-.132-.666c-.119-.598-.388-1.163-1.001-1.42-.512-.215-1.156-.243-2.12-.243h-11.334c-.963 0-1.608.028-2.12.243-.613.257-.882.822-1.001 1.42l-.132.666c-.392 1.986-.423 3.993-.092 5.992.217 1.315.657 2.583 1.304 3.743.896 1.623 2.233 2.946 3.821 3.81 1.256.685 2.651 1.037 4.064 1.031 1.413.006 2.808-.346 4.064-1.031 1.588-.864 2.925-2.187 3.821-3.81.647-1.161 1.087-2.428 1.304-3.743.33-1.999.3-4.006-.092-5.992zm-1.897 5.719c-.19 1.154-.576 2.264-1.144 3.284-.79 1.43-1.97 2.6-3.364 3.363-1.107.604-2.338.913-3.593.908-1.255.005-2.486-.304-3.593-.908-1.394-.763-2.574-1.933-3.364-3.363-.568-1.02-.954-2.13-1.144-3.284-.294-1.78-.266-3.597.082-5.366l.132-.666c.045-.228.1-.318.156-.34.123-.05.544-.067 1.32-.067h11.334c.777 0 1.197.017 1.32.067.056.022.11.112.156.34l.132.666c.348 1.769.376 3.586.082 5.366zM7.228 10.37h9.544c.441 0 .8.359.8.8s-.359.8-.8.8h-9.544c-.441 0-.8-.359-.8-.8s.359-.8.8-.8z" />
                         </svg>
-                        <span id="donateTxt">Donate</span>
+                        <span id="bmcTxt">Buy me a coffee</span>
                     </a>
-                    <div
-                        style="transform: scale(0.85); transform-origin: left center; display: flex; align-items: center;">
-                        <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
-                            data-name="bmc-button" data-slug="richmondgoh" data-color="#5F7FFF" data-emoji=""
-                            data-font="Lato" data-text="Buy me a coffee" data-outline-color="#000000"
-                            data-font-color="#ffffff" data-coffee-color="#FFDD00"></script>
-                    </div>
                 </div>
             </div>
         </div>
@@ -481,7 +471,7 @@
                 about_title: "About this Project",
                 about_desc: "This is a ultra-secure, client-side TOTP viewer. Your secrets are processed only in your browser and never sent to any server. It supports bookmarkable URLs for quick access while maintaining a premium glassmorphic aesthetic.",
                 copied: "COPIED",
-                donate: "Donate"
+                bmc: "Buy me a coffee"
             },
             cn: {
                 title: "TOTP 令牌生成器",
@@ -500,7 +490,7 @@
                 about_title: "关于本项目",
                 about_desc: "这是一个超安全的客户端 TOTP 查看器。您的密钥仅在浏览器中处理，永远不会发送到任何服务器。它支持书签链接以实现快速访问，同时保持高端的磨砂玻璃审美。",
                 copied: "已复制",
-                donate: "捐赠"
+                bmc: "请我喝杯咖啡"
             }
         };
 
@@ -519,7 +509,7 @@
             about_title: document.getElementById('aboutTitleText'),
             about_desc: document.getElementById('aboutDescText'),
             copy_feedback: document.getElementById('copyFeedback'),
-            donate: document.getElementById('donateTxt')
+            bmc: document.getElementById('bmcTxt')
         };
 
         const secretInput = document.getElementById('secret');
@@ -558,7 +548,7 @@
             elements.about_title.textContent = t.about_title;
             elements.about_desc.textContent = t.about_desc;
             elements.copy_feedback.textContent = t.copied;
-            elements.donate.textContent = t.donate;
+            elements.bmc.textContent = t.bmc;
             langSelect.value = lang;
         }
 
