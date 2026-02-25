@@ -57,3 +57,7 @@ The server will be available at `http://localhost:8080`. It serves the same prem
 - **HTML5/CSS3**: Premium glassmorphic UI.
 - **JavaScript (Vanilla)**: Core client-side and serverless logic.
 - **Cloudflare Pages**: High-performance serverless hosting.
+
+TODO:
+- Add a copy button to copy the totp code to the clipboard
+- Add ability to have dark mode or light mode
