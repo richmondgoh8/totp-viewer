@@ -96,32 +96,41 @@
 
         .container {
             width: 100%;
-            max-width: 1100px;
+            max-width: 1200px;
             display: grid;
-            grid-template-columns: 1.2fr 1fr;
+            grid-template-columns: 1fr 1.5fr;
             grid-template-areas:
                 "totp accounts"
-                "about accounts";
-            gap: 30px;
-            align-items: start;
+                "about about";
+            gap: 24px;
             position: relative;
         }
 
         .container.share-mode {
-            grid-template-columns: 1fr;
-            grid-template-areas:
-                "totp"
-                "about";
-            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 550px;
             margin: 0 auto;
+            grid-template-areas: none !important;
+        }
+
+        .container.share-mode .card,
+        .container.share-mode .about-section {
+            width: 100%;
         }
 
         #totpCard {
             grid-area: totp;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         #accountsDashboard {
             grid-area: accounts;
+            display: flex;
+            flex-direction: column;
         }
 
         #aboutSection {
@@ -137,6 +146,8 @@
             padding: 40px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
             text-align: center;
+            height: 100%;
+            box-sizing: border-box;
         }
 
         h1 {
@@ -379,9 +390,46 @@
             margin-bottom: 20px;
         }
 
+        .accounts-scroll-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            /* Space for scrollbar */
+            cursor: grab;
+        }
+
+        .accounts-scroll-wrapper:active {
+            cursor: grabbing;
+        }
+
+        /* Beautiful High-Visibility Glassmorphic Scrollbar */
+        .accounts-scroll-wrapper::-webkit-scrollbar {
+            height: 10px;
+        }
+
+        .accounts-scroll-wrapper::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin: 0 10px;
+        }
+
+        .accounts-scroll-wrapper::-webkit-scrollbar-thumb {
+            background: linear-gradient(to right, var(--primary), #818cf8, var(--secondary));
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+        }
+
+        .accounts-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to right, #818cf8, var(--primary));
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
+        }
+
         .accounts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-auto-flow: column;
+            grid-template-rows: repeat(4, 1fr);
+            grid-auto-columns: calc((100% - 24px) / 3);
             gap: 12px;
             margin-bottom: 20px;
         }
@@ -485,7 +533,33 @@
         .backup-restore {
             display: flex;
             gap: 8px;
-            margin-top: 16px;
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid var(--error);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-danger:hover {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-danger.btn-small {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            border-radius: 8px;
         }
 
         .btn-small {
@@ -519,6 +593,18 @@
                     "accounts"
                     "about";
                 gap: 20px;
+            }
+
+            .accounts-grid {
+                grid-auto-flow: row;
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+                grid-auto-columns: auto;
+            }
+
+            .accounts-scroll-wrapper {
+                overflow-x: visible;
+                cursor: default;
             }
 
             .card {
@@ -611,12 +697,17 @@
                 <h2 id="accountsTitle">My Accounts</h2>
                 <button class="btn-primary btn-small" id="addNewAccountBtn">+ Add New</button>
             </div>
-            <div id="accountsList" class="accounts-grid">
-                <!-- Accounts will be injected here -->
+            <div class="accounts-scroll-wrapper" id="accountsScroll">
+                <div id="accountsList" class="accounts-grid">
+                    <!-- Accounts will be injected here -->
+                </div>
             </div>
             <div class="backup-restore">
-                <button class="btn-secondary btn-small" id="exportBtn">Export JSON</button>
-                <button class="btn-secondary btn-small" id="importBtn">Import JSON</button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-secondary btn-small" id="exportBtn">Export JSON</button>
+                    <button class="btn-secondary btn-small" id="importBtn">Import JSON</button>
+                </div>
+                <button class="btn-danger btn-small" id="deleteAllBtn">Delete All</button>
                 <input type="file" id="importInput" class="hidden" accept=".json">
             </div>
         </div>
@@ -688,7 +779,9 @@
                 copied: "COPIED",
                 share: "Share",
                 link_copied: "LINK COPIED",
-                bmc: "Buy me a coffee"
+                bmc: "Buy me a coffee",
+                delete_all: "Delete All",
+                confirm_delete_all: "Are you sure you want to delete ALL accounts? This cannot be undone."
             },
             cn: {
                 title: "TOTP 令牌生成器",
@@ -709,7 +802,9 @@
                 copied: "已复制",
                 share: "分享",
                 link_copied: "链接已复制",
-                bmc: "请我喝杯咖啡"
+                bmc: "请我喝杯咖啡",
+                delete_all: "删除全部",
+                confirm_delete_all: "您确定要删除所有帐号吗？此操作无法撤销。"
             }
         };
 
@@ -795,8 +890,10 @@
             closeModalBtn: document.getElementById('closeModalBtn'),
             exportBtn: document.getElementById('exportBtn'),
             importBtn: document.getElementById('importBtn'),
+            deleteAllBtn: document.getElementById('deleteAllBtn'),
             importInput: document.getElementById('importInput'),
             aboutSection: document.getElementById('aboutSection'),
+            accountsScroll: document.getElementById('accountsScroll'),
             shareBtn: document.getElementById('shareBtn'),
             shareBtnTxt: document.getElementById('shareBtnTxt'),
             shareFeedback: document.getElementById('shareFeedback')
@@ -838,6 +935,7 @@
             elements.shareBtnTxt.textContent = t.share;
             elements.shareFeedback.textContent = t.link_copied;
             elements.bmc.textContent = t.bmc;
+            elements.deleteAllBtn.textContent = t.delete_all;
             langSelect.value = lang;
         }
 
@@ -969,6 +1067,24 @@
             renderAccounts();
         }
 
+        function deleteAllAccounts() {
+            if (confirm(i18n[currentLang].confirm_delete_all)) {
+                accounts = [];
+                activeAccountId = null;
+                secretInput.value = '';
+                totpCode.textContent = '------';
+                progressBar.style.width = '100%';
+                timerText.textContent = '30';
+                elements.shareBtn.classList.add('hidden');
+                if (refreshTimer) {
+                    clearInterval(refreshTimer);
+                    refreshTimer = null;
+                }
+                localStorage.setItem('totp-accounts', JSON.stringify(accounts));
+                renderAccounts();
+            }
+        }
+
         function saveAccount(name, secret) {
             const id = Date.now().toString();
             accounts.push({ id, name, secret });
@@ -995,8 +1111,16 @@
                 try {
                     const imported = JSON.parse(event.target.result);
                     if (Array.isArray(imported)) {
-                        accounts = [...accounts, ...imported.filter(a => !accounts.some(ea => ea.secret === a.secret))];
+                        accounts = imported;
                         localStorage.setItem('totp-accounts', JSON.stringify(accounts));
+                        activeAccountId = null;
+                        if (accounts.length > 0) {
+                            showAccountTotp(accounts[0]);
+                        } else {
+                            secretInput.value = '';
+                            totpCode.textContent = '------';
+                            elements.shareBtn.classList.add('hidden');
+                        }
                         renderAccounts();
                     }
                 } catch (err) {
@@ -1023,6 +1147,7 @@
 
         elements.exportBtn.onclick = exportAccounts;
         elements.importBtn.onclick = () => elements.importInput.click();
+        elements.deleteAllBtn.onclick = deleteAllAccounts;
         elements.importInput.onchange = importAccounts;
 
         langSelect.onchange = (e) => applyLanguage(e.target.value);
@@ -1076,6 +1201,31 @@
             if (accounts.length > 0) showAccountTotp(accounts[0]);
         }
 
+        // Mouse-drag scroll for account list
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        elements.accountsScroll.addEventListener('mousedown', (e) => {
+            isDown = true;
+            elements.accountsScroll.classList.add('active');
+            startX = e.pageX - elements.accountsScroll.offsetLeft;
+            scrollLeft = elements.accountsScroll.scrollLeft;
+        });
+        elements.accountsScroll.addEventListener('mouseleave', () => {
+            isDown = false;
+        });
+        elements.accountsScroll.addEventListener('mouseup', () => {
+            isDown = false;
+        });
+        elements.accountsScroll.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - elements.accountsScroll.offsetLeft;
+            const walk = (x - startX) * 2; // Scroll speed
+            elements.accountsScroll.scrollLeft = scrollLeft - walk;
+        });
+
         applyLanguage(currentLang);
         if (currentTheme === 'light') {
             document.body.classList.add('light-mode');
@@ -1085,7 +1235,10 @@
 
         // Initial fetch and every 5 mins
         function updateStars() {
-            fetch(`https://api.github.com/repos/richmondgoh8/totp-viewer?t=${Date.now()}`)
+            fetch(`https://api.github.com/repos/richmondgoh8/totp-viewer?t=${Date.now()}`, {
+                cache: 'no-store',
+                headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+            })
                 .then(res => res.json())
                 .then(data => {
                     if (data.stargazers_count !== undefined)
