@@ -339,6 +339,139 @@
             font-size: 0.75rem;
         }
 
+        .accounts-section {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .accounts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .accounts-grid {
+            display: grid;
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .account-card {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .account-card:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateX(4px);
+        }
+
+        .account-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .account-name {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .account-secret-preview {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        .account-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            color: var(--error);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .backup-restore {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            border-radius: 8px;
+        }
+
+        .save-banner {
+            background: var(--primary-glow);
+            border: 1px solid var(--primary);
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
         .hidden {
             display: none;
         }
@@ -371,59 +504,66 @@
         <div class="card">
             <h1 id="titleTxt">TOTP Viewer</h1>
             <p class="subtitle" id="subtitleTxt">Secure Time-Based Passwords</p>
-
-            <div class="totp-display" id="displayArea">
-                <div class="code-container">
-                    <div class="code" id="totpCode">------</div>
-                    <button class="copy-btn" id="copyBtn" title="Copy to clipboard">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                        </svg>
-                    </button>
-                    <div class="copy-feedback" id="copyFeedback">COPIED</div>
+            <div id="mainDashboard">
+                <div class="totp-display" id="displayArea">
+                    <div class="code-container">
+                        <div class="code" id="totpCode">------</div>
+                        <button class="copy-btn" id="copyBtn" title="Copy to clipboard">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                        </button>
+                        <div class="copy-feedback" id="copyFeedback">COPIED</div>
+                    </div>
+                    <div class="timer-badge"><span id="timerText">30</span>s <span id="remainingTxt">remaining</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
                 </div>
-                <div class="timer-badge"><span id="timerText">30</span>s <span id="remainingTxt">remaining</span></div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar" id="progressBar"></div>
-                </div>
-            </div>
 
-            <div class="secret-input-group">
-                <label for="secret" id="labelSecret">Shared Secret</label>
-                <input type="text" id="secret" readonly placeholder="?secret= in URL" autocomplete="off">
-            </div>
-
-            <div id="noSecretPrompt" class="hidden"
-                style="margin-bottom: 24px; color: var(--text-muted); font-size: 0.8rem; background: var(--primary-glow); padding: 12px; border-radius: 12px; border: 1px dashed var(--primary);">
-                <b id="missingTxt">Secret Missing:</b> <span id="promptTxt">Please use a URL with a secret parameter,
-                    e.g.:</span><br>
-                <code id="exampleUrl"
-                    style="display: block; margin-top: 8px; color: var(--primary); cursor: pointer; text-decoration: underline;"></code>
-            </div>
-
-            <div class="actions">
-                <button class="btn-primary hidden" id="generateBtn">Update</button>
-                <button class="btn-secondary" id="toggleValidatorBtn" style="grid-column: span 2;">Validate
-                    Code</button>
-            </div>
-
-            <div id="validatorSection" class="validator-section hidden"
-                style="margin-top:30px; border-top:1px solid var(--border); padding-top:20px;">
-                <div id="statusBadge" class="status-badge hidden"></div>
                 <div class="secret-input-group">
-                    <label for="validateCode" id="labelVerify">Enter Code to Verify</label>
-                    <input type="text" id="validateCode" placeholder="123456" maxlength="6">
+                    <label for="secret" id="labelSecret">Shared Secret</label>
+                    <input type="text" id="secret" readonly placeholder="?secret= in URL" autocomplete="off">
                 </div>
-                <div class="secret-input-group">
-                    <label for="windowSteps" id="labelSteps">Tolerance Window (Steps: 30s each)</label>
-                    <input type="number" id="windowSteps" value="1" min="0" max="20">
+
+                <div class="actions" style="margin-bottom: 30px;">
+                    <button class="btn-secondary" id="toggleValidatorBtn">Validate Code</button>
                 </div>
-                <button class="btn-primary" style="width:100%" id="verifyBtn">Verify Now</button>
+
+                <div id="validatorSection" class="validator-section hidden"
+                    style="margin-top:30px; border-top:1px solid var(--border); padding-top:20px;">
+                    <div id="statusBadge" class="status-badge hidden"></div>
+                    <div class="secret-input-group">
+                        <label for="validateCode" id="labelVerify">Enter Code to Verify</label>
+                        <input type="text" id="validateCode" placeholder="123456" maxlength="6">
+                    </div>
+                    <div class="secret-input-group">
+                        <label for="windowSteps" id="labelSteps">Tolerance Window (Steps: 30s each)</label>
+                        <input type="number" id="windowSteps" value="1" min="0" max="20">
+                    </div>
+                    <button class="btn-primary" style="width:100%" id="verifyBtn">Verify Now</button>
+                </div>
             </div>
 
-            <div class="about-section">
+            <div id="accountsDashboard" class="accounts-section">
+                <div class="accounts-header">
+                    <h2 id="accountsTitle">My Accounts</h2>
+                    <button class="btn-primary btn-small" id="addNewAccountBtn">+ Add New</button>
+                </div>
+                <div id="accountsList" class="accounts-grid">
+                    <!-- Accounts will be injected here -->
+                </div>
+                <div class="backup-restore">
+                    <button class="btn-secondary btn-small" id="exportBtn">Export JSON</button>
+                    <button class="btn-secondary btn-small" id="importBtn">Import JSON</button>
+                    <input type="file" id="importInput" class="hidden" accept=".json">
+                </div>
+            </div>
+
+            <div id="aboutSection" class="about-section">
                 <div class="about-title">
                     <span>🛡️</span> <span id="aboutTitleText">About this Project</span>
                 </div>
@@ -447,6 +587,25 @@
                         <span id="bmcTxt">Buy me a coffee</span>
                     </a>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for adding/editing account -->
+    <div id="accountModal" class="modal-overlay">
+        <div class="modal">
+            <h2 id="modalTitle" style="margin-bottom: 20px;">Add New Account</h2>
+            <div class="secret-input-group">
+                <label for="modalAccountName">Account Name</label>
+                <input type="text" id="modalAccountName" placeholder="e.g. Amazon">
+            </div>
+            <div class="secret-input-group">
+                <label for="modalSecret">Shared Secret</label>
+                <input type="text" id="modalSecret" placeholder="JBSWY3DPEHPK3PXP">
+            </div>
+            <div class="actions">
+                <button class="btn-secondary" id="closeModalBtn">Cancel</button>
+                <button class="btn-primary" id="saveModalBtn">Save Account</button>
             </div>
         </div>
     </div>
@@ -553,8 +712,6 @@
             subtitle: document.getElementById('subtitleTxt'),
             remaining: document.getElementById('remainingTxt'),
             labelSecret: document.getElementById('labelSecret'),
-            missing: document.getElementById('missingTxt'),
-            prompt: document.getElementById('promptTxt'),
             update: document.getElementById('generateBtn'),
             validate: document.getElementById('toggleValidatorBtn'),
             verify_now: document.getElementById('verifyBtn'),
@@ -563,7 +720,22 @@
             about_title: document.getElementById('aboutTitleText'),
             about_desc: document.getElementById('aboutDescText'),
             copy_feedback: document.getElementById('copyFeedback'),
-            bmc: document.getElementById('bmcTxt')
+            bmc: document.getElementById('bmcTxt'),
+            // New elements
+            accountsDashboard: document.getElementById('accountsDashboard'),
+            mainDashboard: document.getElementById('mainDashboard'),
+            accountsList: document.getElementById('accountsList'),
+            addNewAccountBtn: document.getElementById('addNewAccountBtn'),
+            accountModal: document.getElementById('accountModal'),
+            modalTitle: document.getElementById('modalTitle'),
+            modalAccountName: document.getElementById('modalAccountName'),
+            modalSecret: document.getElementById('modalSecret'),
+            saveModalBtn: document.getElementById('saveModalBtn'),
+            closeModalBtn: document.getElementById('closeModalBtn'),
+            exportBtn: document.getElementById('exportBtn'),
+            importBtn: document.getElementById('importBtn'),
+            importInput: document.getElementById('importInput'),
+            aboutSection: document.getElementById('aboutSection')
         };
 
         const secretInput = document.getElementById('secret');
@@ -574,15 +746,14 @@
         const validateCodeInput = document.getElementById('validateCode');
         const windowStepsInput = document.getElementById('windowSteps');
         const statusBadge = document.getElementById('statusBadge');
-        const noSecretPrompt = document.getElementById('noSecretPrompt');
-        const exampleUrl = document.getElementById('exampleUrl');
-        const displayArea = document.getElementById('displayArea');
         const langSelect = document.getElementById('langSelect');
         const themeToggle = document.getElementById('themeToggle');
         const copyBtn = document.getElementById('copyBtn');
 
         let currentLang = localStorage.getItem('totp-lang') || 'en';
         let currentTheme = localStorage.getItem('totp-theme') || 'dark';
+        let accounts = JSON.parse(localStorage.getItem('totp-accounts') || '[]');
+        let activeAccountId = null;
 
         function applyLanguage(lang) {
             currentLang = lang;
@@ -592,8 +763,6 @@
             elements.subtitle.textContent = t.subtitle;
             elements.remaining.textContent = t.remaining;
             elements.labelSecret.textContent = t.secret;
-            elements.missing.textContent = t.missing;
-            elements.prompt.textContent = t.prompt;
             elements.update.textContent = t.update;
             elements.validate.textContent = t.validate;
             elements.verify_now.textContent = t.verify_now;
@@ -674,6 +843,105 @@
             }
         }
 
+        // --- Account Management Logic ---
+
+        function renderAccounts() {
+            elements.accountsList.innerHTML = '';
+            accounts.forEach(acc => {
+                const card = document.createElement('div');
+                card.className = 'account-card';
+                card.innerHTML = `
+                    <div class="account-info">
+                        <span class="account-name">${acc.name}</span>
+                        <span class="account-secret-preview">${acc.secret.substr(0, 4)}...${acc.secret.substr(-4)}</span>
+                    </div>
+                    <div class="account-actions">
+                        <button class="action-btn delete-btn" data-id="${acc.id}">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                card.onclick = (e) => {
+                    if (e.target.closest('.delete-btn')) return;
+                    showAccountTotp(acc);
+                };
+                card.querySelector('.delete-btn').onclick = () => deleteAccount(acc.id);
+                elements.accountsList.appendChild(card);
+            });
+        }
+
+        function showAccountTotp(acc) {
+            activeAccountId = acc.id;
+            secretInput.value = acc.secret;
+            fetchTotp();
+            if (!refreshTimer) refreshTimer = setInterval(updateProgress, 1000);
+            updateProgress();
+        }
+
+        function deleteAccount(id) {
+            accounts = accounts.filter(a => a.id !== id);
+            localStorage.setItem('totp-accounts', JSON.stringify(accounts));
+            renderAccounts();
+        }
+
+        function saveAccount(name, secret) {
+            const id = Date.now().toString();
+            accounts.push({ id, name, secret });
+            localStorage.setItem('totp-accounts', JSON.stringify(accounts));
+            renderAccounts();
+            elements.accountModal.classList.remove('show');
+        }
+
+        function exportAccounts() {
+            const data = JSON.stringify(accounts, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `totp-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function importAccounts(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const imported = JSON.parse(event.target.result);
+                    if (Array.isArray(imported)) {
+                        accounts = [...accounts, ...imported.filter(a => !accounts.some(ea => ea.secret === a.secret))];
+                        localStorage.setItem('totp-accounts', JSON.stringify(accounts));
+                        renderAccounts();
+                    }
+                } catch (err) {
+                    alert("Invalid JSON file");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        elements.addNewAccountBtn.onclick = () => {
+            elements.modalTitle.textContent = "Add New Account";
+            elements.modalAccountName.value = '';
+            elements.modalSecret.value = '';
+            elements.accountModal.classList.add('show');
+        };
+
+        elements.closeModalBtn.onclick = () => elements.accountModal.classList.remove('show');
+
+        elements.saveModalBtn.onclick = () => {
+            const name = elements.modalAccountName.value.trim();
+            const secret = elements.modalSecret.value.trim();
+            if (name && secret) saveAccount(name, secret);
+        };
+
+        elements.exportBtn.onclick = exportAccounts;
+        elements.importBtn.onclick = () => elements.importInput.click();
+        elements.importInput.onchange = importAccounts;
+
         langSelect.onchange = (e) => applyLanguage(e.target.value);
         themeToggle.onclick = toggleTheme;
         copyBtn.onclick = copyToClipboard;
@@ -683,18 +951,23 @@
         // Initialization
         const urlParams = new URLSearchParams(window.location.search);
         const urlSecret = urlParams.get('secret');
+
         if (urlSecret) {
+            // SHARE MODE: Minimal UI, no account features
             secretInput.value = urlSecret;
+            elements.mainDashboard.classList.remove('hidden');
+            elements.accountsDashboard.classList.add('hidden');
+            elements.aboutSection.classList.remove('hidden'); // Show About section
             fetchTotp();
             refreshTimer = setInterval(updateProgress, 1000);
             updateProgress();
         } else {
-            noSecretPrompt.classList.remove('hidden');
-            displayArea.style.opacity = '0.3';
-            displayArea.style.pointerEvents = 'none';
-            const demoUrl = window.location.href.split('?')[0] + "?secret=JBSWY3DPEHPK3PXP";
-            exampleUrl.textContent = demoUrl;
-            exampleUrl.onclick = () => window.location.href = demoUrl;
+            // ACCOUNT MODE: Unified dashboard
+            elements.mainDashboard.classList.remove('hidden'); // Always show display
+            elements.accountsDashboard.classList.remove('hidden');
+            elements.aboutSection.classList.remove('hidden');
+            renderAccounts();
+            if (accounts.length > 0) showAccountTotp(accounts[0]);
         }
 
         applyLanguage(currentLang);
