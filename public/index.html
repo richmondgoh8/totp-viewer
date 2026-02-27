@@ -96,8 +96,36 @@
 
         .container {
             width: 100%;
-            max-width: 480px;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            grid-template-areas:
+                "totp accounts"
+                "about accounts";
+            gap: 30px;
+            align-items: start;
             position: relative;
+        }
+
+        .container.share-mode {
+            grid-template-columns: 1fr;
+            grid-template-areas:
+                "totp"
+                "about";
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        #totpCard {
+            grid-area: totp;
+        }
+
+        #accountsDashboard {
+            grid-area: accounts;
+        }
+
+        #aboutSection {
+            grid-area: about;
         }
 
         .card {
@@ -253,7 +281,7 @@
 
         .actions {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 12px;
         }
 
@@ -353,10 +381,9 @@
 
         .accounts-grid {
             display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 12px;
-            max-height: 400px;
-            overflow-y: auto;
-            padding-right: 4px;
+            margin-bottom: 20px;
         }
 
         .account-card {
@@ -375,6 +402,14 @@
             border-color: var(--primary);
             background: rgba(99, 102, 241, 0.1);
             transform: translateX(4px);
+        }
+
+        .account-card.active {
+            border-color: var(--primary);
+            background: var(--primary-glow);
+            box-shadow: 0 4px 12px var(--primary-glow);
+            transform: scale(1.02);
+            border-width: 2px;
         }
 
         .account-info {
@@ -476,7 +511,16 @@
             display: none;
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "totp"
+                    "accounts"
+                    "about";
+                gap: 20px;
+            }
+
             .card {
                 padding: 30px 20px;
             }
@@ -500,10 +544,11 @@
         </button>
     </div>
 
-    <div class="container">
-        <div class="card">
+    <div class="container" id="mainContainer">
+        <div class="card" id="totpCard">
             <h1 id="titleTxt">TOTP Viewer</h1>
             <p class="subtitle" id="subtitleTxt">Secure Time-Based Passwords</p>
+
             <div id="mainDashboard">
                 <div class="totp-display" id="displayArea">
                     <div class="code-container">
@@ -531,6 +576,18 @@
 
                 <div class="actions" style="margin-bottom: 30px;">
                     <button class="btn-secondary" id="toggleValidatorBtn">Validate Code</button>
+                    <button class="btn-primary" id="shareBtn" title="Share Account">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            style="display:inline-block; vertical-align:middle; margin-right:4px;">
+                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                            <polyline points="16 6 12 2 8 6"></polyline>
+                            <line x1="12" y1="2" x2="12" y2="15"></line>
+                        </svg>
+                        <span id="shareBtnTxt">Share</span>
+                    </button>
+                    <div class="copy-feedback" id="shareFeedback"
+                        style="right: auto; left: 50%; transform: translateX(-50%); top: -40px;">LINK COPIED</div>
                 </div>
 
                 <div id="validatorSection" class="validator-section hidden"
@@ -547,46 +604,46 @@
                     <button class="btn-primary" style="width:100%" id="verifyBtn">Verify Now</button>
                 </div>
             </div>
+        </div>
 
-            <div id="accountsDashboard" class="accounts-section">
-                <div class="accounts-header">
-                    <h2 id="accountsTitle">My Accounts</h2>
-                    <button class="btn-primary btn-small" id="addNewAccountBtn">+ Add New</button>
-                </div>
-                <div id="accountsList" class="accounts-grid">
-                    <!-- Accounts will be injected here -->
-                </div>
-                <div class="backup-restore">
-                    <button class="btn-secondary btn-small" id="exportBtn">Export JSON</button>
-                    <button class="btn-secondary btn-small" id="importBtn">Import JSON</button>
-                    <input type="file" id="importInput" class="hidden" accept=".json">
-                </div>
+        <div class="card" id="accountsDashboard">
+            <div class="accounts-header">
+                <h2 id="accountsTitle">My Accounts</h2>
+                <button class="btn-primary btn-small" id="addNewAccountBtn">+ Add New</button>
             </div>
+            <div id="accountsList" class="accounts-grid">
+                <!-- Accounts will be injected here -->
+            </div>
+            <div class="backup-restore">
+                <button class="btn-secondary btn-small" id="exportBtn">Export JSON</button>
+                <button class="btn-secondary btn-small" id="importBtn">Import JSON</button>
+                <input type="file" id="importInput" class="hidden" accept=".json">
+            </div>
+        </div>
 
-            <div id="aboutSection" class="about-section">
-                <div class="about-title">
-                    <span>🛡️</span> <span id="aboutTitleText">About this Project</span>
-                </div>
-                <p id="aboutDescText">This is a ultra-secure, client-side TOTP viewer. Your secrets are processed only
-                    in your browser and never sent to any server. It supports bookmarkable URLs for quick access while
-                    maintaining a premium glassmorphic aesthetic.</p>
-                <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-                    <a href="https://github.com/richmondgoh8/totp-viewer" target="_blank" class="github-link">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                            <path
-                                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                        </svg>
-                        <span>GitHub</span>
-                        <span class="star-box" id="starCount">24</span>
-                    </a>
-                    <a href="https://buymeacoffee.com/richmondgoh" target="_blank" class="bmc-link">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                            <path
-                                d="M20.216 6.415l-.132-.666c-.119-.598-.388-1.163-1.001-1.42-.512-.215-1.156-.243-2.12-.243h-11.334c-.963 0-1.608.028-2.12.243-.613.257-.882.822-1.001 1.42l-.132.666c-.392 1.986-.423 3.993-.092 5.992.217 1.315.657 2.583 1.304 3.743.896 1.623 2.233 2.946 3.821 3.81 1.256.685 2.651 1.037 4.064 1.031 1.413.006 2.808-.346 4.064-1.031 1.588-.864 2.925-2.187 3.821-3.81.647-1.161 1.087-2.428 1.304-3.743.33-1.999.3-4.006-.092-5.992zm-1.897 5.719c-.19 1.154-.576 2.264-1.144 3.284-.79 1.43-1.97 2.6-3.364 3.363-1.107.604-2.338.913-3.593.908-1.255.005-2.486-.304-3.593-.908-1.394-.763-2.574-1.933-3.364-3.363-.568-1.02-.954-2.13-1.144-3.284-.294-1.78-.266-3.597.082-5.366l.132-.666c.045-.228.1-.318.156-.34.123-.05.544-.067 1.32-.067h11.334c.777 0 1.197.017 1.32.067.056.022.11.112.156.34l.132.666c.348 1.769.376 3.586.082 5.366zM7.228 10.37h9.544c.441 0 .8.359.8.8s-.359.8-.8.8h-9.544c-.441 0-.8-.359-.8-.8s.359-.8.8-.8z" />
-                        </svg>
-                        <span id="bmcTxt">Buy me a coffee</span>
-                    </a>
-                </div>
+        <div id="aboutSection" class="about-section">
+            <div class="about-title">
+                <span>🛡️</span> <span id="aboutTitleText">About this Project</span>
+            </div>
+            <p id="aboutDescText">This is a ultra-secure, client-side TOTP viewer. Your secrets are processed only
+                in your browser and never sent to any server. It supports bookmarkable URLs for quick access while
+                maintaining a premium glassmorphic aesthetic.</p>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                <a href="https://github.com/richmondgoh8/totp-viewer" target="_blank" class="github-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                    </svg>
+                    <span>GitHub</span>
+                    <span class="star-box" id="starCount">1</span>
+                </a>
+                <a href="https://buymeacoffee.com/richmondgoh" target="_blank" class="bmc-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M20.216 6.415l-.132-.666c-.119-.598-.388-1.163-1.001-1.42-.512-.215-1.156-.243-2.12-.243h-11.334c-.963 0-1.608.028-2.12.243-.613.257-.882.822-1.001 1.42l-.132.666c-.392 1.986-.423 3.993-.092 5.992.217 1.315.657 2.583 1.304 3.743.896 1.623 2.233 2.946 3.821 3.81 1.256.685 2.651 1.037 4.064 1.031 1.413.006 2.808-.346 4.064-1.031 1.588-.864 2.925-2.187 3.821-3.81.647-1.161 1.087-2.428 1.304-3.743.33-1.999.3-4.006-.092-5.992zm-1.897 5.719c-.19 1.154-.576 2.264-1.144 3.284-.79 1.43-1.97 2.6-3.364 3.363-1.107.604-2.338.913-3.593.908-1.255.005-2.486-.304-3.593-.908-1.394-.763-2.574-1.933-3.364-3.363-.568-1.02-.954-2.13-1.144-3.284-.294-1.78-.266-3.597.082-5.366l.132-.666c.045-.228.1-.318.156-.34.123-.05.544-.067 1.32-.067h11.334c.777 0 1.197.017 1.32.067.056.022.11.112.156.34l.132.666c.348 1.769.376 3.586.082 5.366zM7.228 10.37h9.544c.441 0 .8.359.8.8s-.359.8-.8.8h-9.544c-.441 0-.8-.359-.8-.8s.359-.8.8-.8z" />
+                    </svg>
+                    <span id="bmcTxt">Buy me a coffee</span>
+                </a>
             </div>
         </div>
     </div>
@@ -629,6 +686,8 @@
                 about_title: "About this Project",
                 about_desc: "This is a ultra-secure, client-side TOTP viewer. Your secrets are processed only in your browser and never sent to any server. It supports bookmarkable URLs for quick access while maintaining a premium glassmorphic aesthetic.",
                 copied: "COPIED",
+                share: "Share",
+                link_copied: "LINK COPIED",
                 bmc: "Buy me a coffee"
             },
             cn: {
@@ -648,6 +707,8 @@
                 about_title: "关于本项目",
                 about_desc: "这是一个超安全的客户端 TOTP 查看器。您的密钥仅在浏览器中处理，永远不会发送到任何服务器。它支持书签链接以实现快速访问，同时保持高端的磨砂玻璃审美。",
                 copied: "已复制",
+                share: "分享",
+                link_copied: "链接已复制",
                 bmc: "请我喝杯咖啡"
             }
         };
@@ -735,7 +796,10 @@
             exportBtn: document.getElementById('exportBtn'),
             importBtn: document.getElementById('importBtn'),
             importInput: document.getElementById('importInput'),
-            aboutSection: document.getElementById('aboutSection')
+            aboutSection: document.getElementById('aboutSection'),
+            shareBtn: document.getElementById('shareBtn'),
+            shareBtnTxt: document.getElementById('shareBtnTxt'),
+            shareFeedback: document.getElementById('shareFeedback')
         };
 
         const secretInput = document.getElementById('secret');
@@ -771,6 +835,8 @@
             elements.about_title.textContent = t.about_title;
             elements.about_desc.textContent = t.about_desc;
             elements.copy_feedback.textContent = t.copied;
+            elements.shareBtnTxt.textContent = t.share;
+            elements.shareFeedback.textContent = t.link_copied;
             elements.bmc.textContent = t.bmc;
             langSelect.value = lang;
         }
@@ -849,7 +915,7 @@
             elements.accountsList.innerHTML = '';
             accounts.forEach(acc => {
                 const card = document.createElement('div');
-                card.className = 'account-card';
+                card.className = `account-card ${acc.id === activeAccountId ? 'active' : ''}`;
                 card.innerHTML = `
                     <div class="account-info">
                         <span class="account-name">${acc.name}</span>
@@ -867,7 +933,10 @@
                     if (e.target.closest('.delete-btn')) return;
                     showAccountTotp(acc);
                 };
-                card.querySelector('.delete-btn').onclick = () => deleteAccount(acc.id);
+                card.querySelector('.delete-btn').onclick = (e) => {
+                    e.stopPropagation();
+                    deleteAccount(acc.id);
+                };
                 elements.accountsList.appendChild(card);
             });
         }
@@ -875,12 +944,26 @@
         function showAccountTotp(acc) {
             activeAccountId = acc.id;
             secretInput.value = acc.secret;
+            elements.shareBtn.classList.remove('hidden');
+            renderAccounts(); // Re-render to update active class
             fetchTotp();
             if (!refreshTimer) refreshTimer = setInterval(updateProgress, 1000);
             updateProgress();
         }
 
         function deleteAccount(id) {
+            if (activeAccountId === id) {
+                activeAccountId = null;
+                secretInput.value = '';
+                totpCode.textContent = '------';
+                progressBar.style.width = '100%';
+                timerText.textContent = '30';
+                elements.shareBtn.classList.add('hidden');
+                if (refreshTimer) {
+                    clearInterval(refreshTimer);
+                    refreshTimer = null;
+                }
+            }
             accounts = accounts.filter(a => a.id !== id);
             localStorage.setItem('totp-accounts', JSON.stringify(accounts));
             renderAccounts();
@@ -948,15 +1031,37 @@
         document.getElementById('toggleValidatorBtn').onclick = () => validatorSection.classList.toggle('hidden');
         document.getElementById('verifyBtn').onclick = verifyCode;
 
+        async function shareAccount() {
+            const secret = secretInput.value.trim();
+            if (!secret) return;
+            const baseUrl = window.location.href.split('?')[0];
+            const url = `${baseUrl}?secret=${secret}`;
+
+            try {
+                // Open new tab
+                window.open(url, '_blank');
+                // Copy to clipboard
+                await navigator.clipboard.writeText(url);
+                // Feedback
+                elements.shareFeedback.classList.add('show');
+                setTimeout(() => elements.shareFeedback.classList.remove('show'), 2000);
+            } catch (err) {
+                console.error('Share failed', err);
+            }
+        }
+        elements.shareBtn.onclick = shareAccount;
+
         // Initialization
         const urlParams = new URLSearchParams(window.location.search);
         const urlSecret = urlParams.get('secret');
 
         if (urlSecret) {
             // SHARE MODE: Minimal UI, no account features
+            document.getElementById('mainContainer').classList.add('share-mode');
             secretInput.value = urlSecret;
             elements.mainDashboard.classList.remove('hidden');
             elements.accountsDashboard.classList.add('hidden');
+            elements.shareBtn.classList.add('hidden');
             elements.aboutSection.classList.remove('hidden'); // Show About section
             fetchTotp();
             refreshTimer = setInterval(updateProgress, 1000);
@@ -965,6 +1070,7 @@
             // ACCOUNT MODE: Unified dashboard
             elements.mainDashboard.classList.remove('hidden'); // Always show display
             elements.accountsDashboard.classList.remove('hidden');
+            elements.shareBtn.classList.add('hidden'); // Hide until selected
             elements.aboutSection.classList.remove('hidden');
             renderAccounts();
             if (accounts.length > 0) showAccountTotp(accounts[0]);
@@ -977,13 +1083,17 @@
             document.getElementById('themeText').textContent = 'Light';
         }
 
-        // Fetch Github stars
-        fetch('https://api.github.com/repos/richmondgoh8/totp-viewer')
-            .then(res => res.json())
-            .then(data => {
-                if (data.stargazers_count !== undefined)
-                    document.getElementById('starCount').textContent = data.stargazers_count;
-            }).catch(() => { });
+        // Initial fetch and every 5 mins
+        function updateStars() {
+            fetch(`https://api.github.com/repos/richmondgoh8/totp-viewer?t=${Date.now()}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.stargazers_count !== undefined)
+                        document.getElementById('starCount').textContent = data.stargazers_count;
+                }).catch(() => { });
+        }
+        updateStars();
+        setInterval(updateStars, 300000); // 5 minutes
     </script>
 </body>
 
