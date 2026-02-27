@@ -451,7 +451,6 @@
         </div>
     </div>
 
-    <script src="wasm_exec.js"></script>
     <script>
         const i18n = {
             en: {
@@ -493,6 +492,61 @@
                 bmc: "请我喝杯咖啡"
             }
         };
+
+        // --- TOTP Implementation in JS ---
+
+        function base32ToBuf(s) {
+            s = s.toUpperCase().replace(/ /g, '');
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+            let bits = "";
+            for (let i = 0; i < s.length; i++) {
+                const val = alphabet.indexOf(s[i]);
+                if (val === -1) continue;
+                bits += val.toString(2).padStart(5, '0');
+            }
+            const buf = new Uint8Array(Math.floor(bits.length / 8));
+            for (let i = 0; i < buf.length; i++) {
+                buf[i] = parseInt(bits.substr(i * 8, 8), 2);
+            }
+            return buf;
+        }
+
+        async function generateTOTP(secret, time = Date.now()) {
+            try {
+                const keyBuf = base32ToBuf(secret);
+                const epoch = Math.floor(time / 1000);
+                const counter = Math.floor(epoch / 30);
+
+                // Prepare counter as 8-byte big-endian
+                const msg = new Uint8Array(8);
+                let tempCounter = counter;
+                for (let i = 7; i >= 0; i--) {
+                    msg[i] = tempCounter & 0xff;
+                    tempCounter = tempCounter >> 8;
+                }
+
+                const cryptoKey = await crypto.subtle.importKey(
+                    "raw", keyBuf,
+                    { name: "HMAC", hash: "SHA-1" },
+                    false, ["sign"]
+                );
+
+                const signature = await crypto.subtle.sign("HMAC", cryptoKey, msg);
+                const hmac = new Uint8Array(signature);
+                const offset = hmac[hmac.length - 1] & 0x0f;
+                const otp = (
+                    ((hmac[offset] & 0x7f) << 24) |
+                    ((hmac[offset + 1] & 0xff) << 16) |
+                    ((hmac[offset + 2] & 0xff) << 8) |
+                    (hmac[offset + 3] & 0xff)
+                ) % 1000000;
+
+                return otp.toString().padStart(6, '0');
+            } catch (e) {
+                console.error("TOTP Generation Error:", e);
+                return null;
+            }
+        }
 
         const elements = {
             title: document.getElementById('titleTxt'),
@@ -586,12 +640,8 @@
         async function fetchTotp() {
             const secret = secretInput.value.trim();
             if (!secret) return;
-            // Now using Wasm-exported Go function
-            if (window.generateTOTPGo) {
-                const result = window.generateTOTPGo(secret);
-                if (result.totp) totpCode.textContent = result.totp;
-                else if (result.error) console.error('TOTP Error:', result.error);
-            }
+            const totp = await generateTOTP(secret);
+            if (totp) totpCode.textContent = totp;
         }
 
         async function verifyCode() {
@@ -600,17 +650,27 @@
             const windowSteps = parseInt(windowStepsInput.value.trim() || '1');
             if (!secret || !code) return;
 
-            // Now using Wasm-exported Go function
-            if (window.validateTOTPGo) {
-                const result = window.validateTOTPGo(secret, code, windowSteps);
-                statusBadge.classList.remove('hidden', 'status-valid', 'status-invalid');
-                if (result.valid) {
-                    statusBadge.textContent = i18n[currentLang].verified;
-                    statusBadge.classList.add('status-valid');
-                } else {
-                    statusBadge.textContent = i18n[currentLang].invalid;
-                    statusBadge.classList.add('status-invalid');
+            statusBadge.classList.remove('hidden', 'status-valid', 'status-invalid');
+            let isValid = false;
+
+            const now = Date.now();
+            for (let i = -windowSteps; i <= windowSteps; i++) {
+                const checkTime = now + (i * 30000);
+                const checkOtp = await generateTOTP(secret, checkTime);
+                if (checkOtp === code) {
+                    isValid = true;
+                    break;
                 }
+            }
+
+            if (isValid) {
+                statusBadge.textContent = i18n[currentLang].verified;
+                statusBadge.style.color = 'var(--success)';
+                statusBadge.classList.remove('hidden');
+            } else {
+                statusBadge.textContent = i18n[currentLang].invalid;
+                statusBadge.style.color = 'var(--error)';
+                statusBadge.classList.remove('hidden');
             }
         }
 
@@ -620,31 +680,23 @@
         document.getElementById('toggleValidatorBtn').onclick = () => validatorSection.classList.toggle('hidden');
         document.getElementById('verifyBtn').onclick = verifyCode;
 
-        // Wasm Initialization
-        const go = new Go();
-        WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
-            go.run(result.instance);
-            console.log("Wasm initialized");
+        // Initialization
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlSecret = urlParams.get('secret');
+        if (urlSecret) {
+            secretInput.value = urlSecret;
+            fetchTotp();
+            refreshTimer = setInterval(updateProgress, 1000);
+            updateProgress();
+        } else {
+            noSecretPrompt.classList.remove('hidden');
+            displayArea.style.opacity = '0.3';
+            displayArea.style.pointerEvents = 'none';
+            const demoUrl = window.location.href.split('?')[0] + "?secret=JBSWY3DPEHPK3PXP";
+            exampleUrl.textContent = demoUrl;
+            exampleUrl.onclick = () => window.location.href = demoUrl;
+        }
 
-            // Initial fetch after Wasm is ready
-            const urlParams = new URLSearchParams(window.location.search);
-            const urlSecret = urlParams.get('secret');
-            if (urlSecret) {
-                secretInput.value = urlSecret;
-                fetchTotp();
-                refreshTimer = setInterval(updateProgress, 1000);
-                updateProgress();
-            } else {
-                noSecretPrompt.classList.remove('hidden');
-                displayArea.style.opacity = '0.3';
-                displayArea.style.pointerEvents = 'none';
-                const demoUrl = window.location.href.split('?')[0] + "?secret=JBSWY3DPEHPK3PXP";
-                exampleUrl.textContent = demoUrl;
-                exampleUrl.onclick = () => window.location.href = demoUrl;
-            }
-        });
-
-        // Init
         applyLanguage(currentLang);
         if (currentTheme === 'light') {
             document.body.classList.add('light-mode');
