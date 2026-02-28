@@ -53,14 +53,13 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 80px 20px 20px 20px;
             overflow-x: hidden;
         }
 
         .top-nav {
-            position: fixed;
-            top: 20px;
-            right: 20px;
+            align-self: flex-end;
+            margin-bottom: 20px;
             display: flex;
             gap: 12px;
             z-index: 100;
@@ -68,6 +67,7 @@
 
         .nav-btn {
             background: var(--card-bg);
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
             border: 1px solid var(--border);
             padding: 8px 12px;
@@ -84,6 +84,7 @@
 
         .language-select {
             background: var(--card-bg);
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
             border: 1px solid var(--border);
             padding: 8px 12px;
@@ -94,6 +95,8 @@
             font-size: 0.85rem;
             cursor: pointer;
             outline: none;
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         .container {
@@ -141,8 +144,8 @@
 
         .card {
             background: var(--card-bg);
-            backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(16px);
             border: 1px solid var(--border);
             border-radius: 32px;
             padding: 40px;
@@ -375,9 +378,10 @@
         }
 
         .accounts-scroll-wrapper {
-            width: 100%;
+            width: calc(100% + 24px);
+            margin-left: -12px;
+            padding: 12px 12px 8px 12px;
             overflow-x: auto;
-            padding-bottom: 8px;
             /* Space for scrollbar */
             cursor: grab;
         }
@@ -489,6 +493,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.7);
+            -webkit-backdrop-filter: blur(4px);
             backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
@@ -569,6 +574,16 @@
             display: none;
         }
 
+        .mb-30 { margin-bottom: 30px; }
+        .mb-20 { margin-bottom: 20px; }
+        .w-100 { width: 100%; }
+        .flex-gap-8 { display: flex; gap: 8px; }
+        .about-links { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+        .github-btn-wrapper { margin-left: auto; display: flex; align-items: center; }
+        .btn-icon { display: inline-block; vertical-align: middle; margin-right: 4px; }
+        .share-feedback-pos { right: auto; left: 50%; transform: translateX(-50%); top: -40px; }
+        .validator-section-styled { margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px; }
+
         @media (max-width: 900px) {
             .container {
                 grid-template-columns: 1fr;
@@ -604,11 +619,11 @@
 
 <body>
     <div class="top-nav">
-        <select id="langSelect" class="language-select">
+        <select id="langSelect" class="language-select" aria-label="Select Language">
             <option value="en">English</option>
             <option value="cn">中文</option>
         </select>
-        <button id="themeToggle" class="nav-btn">
+        <button id="themeToggle" class="nav-btn" aria-label="Toggle Theme">
             <span id="themeIcon">🌙</span>
             <span id="themeText">Dark</span>
         </button>
@@ -644,24 +659,22 @@
                     <input type="text" id="secret" readonly placeholder="?secret= in URL" autocomplete="off">
                 </div>
 
-                <div class="actions" style="margin-bottom: 30px;">
+                <div class="actions mb-30">
                     <button class="btn-secondary" id="toggleValidatorBtn">Validate Code</button>
                     <button class="btn-primary" id="shareBtn" title="Share Account">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            style="display:inline-block; vertical-align:middle; margin-right:4px;">
+                            class="btn-icon">
                             <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
                             <polyline points="16 6 12 2 8 6"></polyline>
                             <line x1="12" y1="2" x2="12" y2="15"></line>
                         </svg>
                         <span id="shareBtnTxt">Share</span>
                     </button>
-                    <div class="copy-feedback" id="shareFeedback"
-                        style="right: auto; left: 50%; transform: translateX(-50%); top: -40px;">LINK COPIED</div>
+                    <div class="copy-feedback share-feedback-pos" id="shareFeedback">LINK COPIED</div>
                 </div>
 
-                <div id="validatorSection" class="validator-section hidden"
-                    style="margin-top:30px; border-top:1px solid var(--border); padding-top:20px;">
+                <div id="validatorSection" class="validator-section hidden validator-section-styled">
                     <div id="statusBadge" class="status-badge hidden"></div>
                     <div class="secret-input-group">
                         <label for="validateCode" id="labelVerify">Enter Code to Verify</label>
@@ -671,7 +684,7 @@
                         <label for="windowSteps" id="labelSteps">Tolerance Window (Steps: 30s each)</label>
                         <input type="number" id="windowSteps" value="1" min="0" max="20">
                     </div>
-                    <button class="btn-primary" style="width:100%" id="verifyBtn">Verify Now</button>
+                    <button class="btn-primary w-100" id="verifyBtn">Verify Now</button>
                 </div>
             </div>
         </div>
@@ -687,19 +700,19 @@
                 </div>
             </div>
             <div class="backup-restore">
-                <div style="display: flex; gap: 8px;">
+                <div class="flex-gap-8">
                     <button class="btn-secondary btn-small" id="exportBtn">Export JSON</button>
                     <button class="btn-secondary btn-small" id="importBtn">Import JSON</button>
                 </div>
                 <button class="btn-danger btn-small" id="deleteAllBtn">Delete All</button>
-                <input type="file" id="importInput" class="hidden" accept=".json">
+                <input type="file" id="importInput" class="hidden" accept=".json" aria-label="Import JSON File">
             </div>
         </div>
 
         <div id="aboutSection" class="about-section">
             <div class="about-title">
                 <span>🛡️</span> <span id="aboutTitleText">About this Project</span>
-                <div style="margin-left: auto; display: flex; align-items: center;">
+                <div class="github-btn-wrapper">
                     <!-- Place this tag where you want the button to render. -->
                     <a class="github-button" href="https://github.com/richmondgoh8/totp-viewer"
                         data-color-scheme="no-preference: light; light: light; dark: dark;" data-size="large"
@@ -709,8 +722,8 @@
             <p id="aboutDescText">This is a ultra-secure, client-side TOTP viewer. Your secrets are processed only
                 in your browser and never sent to any server. It supports bookmarkable URLs for quick access while
                 maintaining a premium glassmorphic aesthetic.</p>
-            <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-                <a href="https://buymeacoffee.com/richmondgoh" target="_blank" class="bmc-link">
+            <div class="about-links">
+                <a href="https://buymeacoffee.com/richmondgoh" target="_blank" rel="noopener noreferrer" class="bmc-link">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                         <path
                             d="M20.216 6.415l-.132-.666c-.119-.598-.388-1.163-1.001-1.42-.512-.215-1.156-.243-2.12-.243h-11.334c-.963 0-1.608.028-2.12.243-.613.257-.882.822-1.001 1.42l-.132.666c-.392 1.986-.423 3.993-.092 5.992.217 1.315.657 2.583 1.304 3.743.896 1.623 2.233 2.946 3.821 3.81 1.256.685 2.651 1.037 4.064 1.031 1.413.006 2.808-.346 4.064-1.031 1.588-.864 2.925-2.187 3.821-3.81.647-1.161 1.087-2.428 1.304-3.743.33-1.999.3-4.006-.092-5.992zm-1.897 5.719c-.19 1.154-.576 2.264-1.144 3.284-.79 1.43-1.97 2.6-3.364 3.363-1.107.604-2.338.913-3.593.908-1.255.005-2.486-.304-3.593-.908-1.394-.763-2.574-1.933-3.364-3.363-.568-1.02-.954-2.13-1.144-3.284-.294-1.78-.266-3.597.082-5.366l.132-.666c.045-.228.1-.318.156-.34.123-.05.544-.067 1.32-.067h11.334c.777 0 1.197.017 1.32.067.056.022.11.112.156.34l.132.666c.348 1.769.376 3.586.082 5.366zM7.228 10.37h9.544c.441 0 .8.359.8.8s-.359.8-.8.8h-9.544c-.441 0-.8-.359-.8-.8s.359-.8.8-.8z" />
@@ -724,7 +737,7 @@
     <!-- Modal for adding/editing account -->
     <div id="accountModal" class="modal-overlay">
         <div class="modal">
-            <h2 id="modalTitle" style="margin-bottom: 20px;">Add New Account</h2>
+            <h2 id="modalTitle" class="mb-20">Add New Account</h2>
             <div class="secret-input-group">
                 <label for="modalAccountName">Account Name</label>
                 <input type="text" id="modalAccountName" placeholder="e.g. Amazon">
