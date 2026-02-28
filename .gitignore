@@ -42,5 +42,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Project Biaries
+# Project Binaries
 totp-viewer
+*.zip

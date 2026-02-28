@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint public/app.js"
+    "lint": "eslint public/app.js",
+    "build:zip": "zip -r totp-viewer-standalone.zip public/"
   },
   "repository": {
     "type": "git",
