@@ -26,6 +26,7 @@ const i18n = {
                 export: "Export JSON",
                 import: "Import JSON",
                 modal_title_add: "Add New Account",
+                modal_title_edit: "Edit Account",
                 modal_account_name: "Account Name",
                 modal_secret: "Shared Secret",
                 cancel: "Cancel",
@@ -61,6 +62,7 @@ const i18n = {
                 export: "导出 JSON",
                 import: "导入 JSON",
                 modal_title_add: "新增帐号",
+                modal_title_edit: "编辑帐号",
                 modal_account_name: "帐号名称",
                 modal_secret: "共享密钥",
                 cancel: "取消",
@@ -181,6 +183,7 @@ const i18n = {
         let currentTheme = localStorage.getItem('totp-theme') || 'dark';
         let accounts = JSON.parse(localStorage.getItem('totp-accounts') || '[]');
         let activeAccountId = null;
+        let editingAccountId = null;
 
         function applyLanguage(lang) {
             currentLang = lang;
@@ -206,7 +209,7 @@ const i18n = {
             elements.addNewAccountBtn.textContent = t.add_new;
             elements.exportBtn.textContent = t.export;
             elements.importBtn.textContent = t.import;
-            elements.modalTitle.textContent = t.modal_title_add;
+            elements.modalTitle.textContent = editingAccountId ? t.modal_title_edit : t.modal_title_add;
             elements.labelModalAccountName.textContent = t.modal_account_name;
             elements.labelModalSecret.textContent = t.modal_secret;
             elements.closeModalBtn.textContent = t.cancel;
@@ -311,7 +314,13 @@ const i18n = {
                         <span class="account-secret-preview">${acc.secret.substr(0, 4)}...${acc.secret.substr(-4)}</span>
                     </div>
                     <div class="account-actions">
-                        <button class="action-btn delete-btn" data-id="${acc.id}">
+                        <button class="action-btn edit-btn" data-id="${acc.id}" title="Edit Account">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </button>
+                        <button class="action-btn delete-btn" data-id="${acc.id}" title="Delete Account">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/>
                             </svg>
@@ -319,8 +328,12 @@ const i18n = {
                     </div>
                 `;
                 card.onclick = (e) => {
-                    if (e.target.closest('.delete-btn')) return;
+                    if (e.target.closest('.delete-btn') || e.target.closest('.edit-btn')) return;
                     showAccountTotp(acc);
+                };
+                card.querySelector('.edit-btn').onclick = (e) => {
+                    e.stopPropagation();
+                    editAccount(acc);
                 };
                 card.querySelector('.delete-btn').onclick = (e) => {
                     e.stopPropagation();
@@ -373,9 +386,41 @@ const i18n = {
         }
 
         function saveAccount(name, secret) {
-            const id = Date.now().toString();
-            updateAccountsState([...accounts, { id, name, secret }]);
+            if (editingAccountId) {
+                // Edit existing account
+                const updatedAccounts = accounts.map(a => {
+                    if (a.id === editingAccountId) {
+                        return { ...a, name, secret };
+                    }
+                    return a;
+                });
+                updateAccountsState(updatedAccounts);
+                
+                // If it's the active account being edited, update UI
+                if (activeAccountId === editingAccountId) {
+                    secretInput.value = secret;
+                    totpCode.textContent = "------";
+                    if (refreshTimer) {
+                        clearInterval(refreshTimer);
+                        refreshTimer = null;
+                    }
+                    showAccountTotp(updatedAccounts.find(a => a.id === editingAccountId));
+                }
+            } else {
+                // Add new account
+                const id = Date.now().toString();
+                updateAccountsState([...accounts, { id, name, secret }]);
+            }
             elements.accountModal.classList.remove('show');
+            editingAccountId = null;
+        }
+
+        function editAccount(acc) {
+            editingAccountId = acc.id;
+            elements.modalTitle.textContent = i18n[currentLang].modal_title_edit;
+            elements.modalAccountName.value = acc.name;
+            elements.modalSecret.value = acc.secret;
+            elements.accountModal.classList.add('show');
         }
 
         function exportAccounts() {
@@ -415,13 +460,17 @@ const i18n = {
         }
 
         elements.addNewAccountBtn.onclick = () => {
+            editingAccountId = null;
             elements.modalTitle.textContent = i18n[currentLang].modal_title_add;
             elements.modalAccountName.value = '';
             elements.modalSecret.value = '';
             elements.accountModal.classList.add('show');
         };
 
-        elements.closeModalBtn.onclick = () => elements.accountModal.classList.remove('show');
+        elements.closeModalBtn.onclick = () => {
+            editingAccountId = null;
+            elements.accountModal.classList.remove('show');
+        };
 
         elements.saveModalBtn.onclick = () => {
             const name = elements.modalAccountName.value.trim();
