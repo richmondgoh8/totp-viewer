@@ -560,7 +560,7 @@
         }
 
         .hidden {
-            display: none;
+            display: none !important;
         }
 
         .mb-30 { margin-bottom: 30px; }

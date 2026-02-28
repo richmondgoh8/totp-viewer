@@ -30,6 +30,7 @@ const i18n = {
                 modal_secret: "Shared Secret",
                 cancel: "Cancel",
                 save_account: "Save Account",
+                add_to_dashboard: "Add to Dashboard",
                 theme_light: "Light",
                 theme_dark: "Dark"
             },
@@ -64,6 +65,7 @@ const i18n = {
                 modal_secret: "共享密钥",
                 cancel: "取消",
                 save_account: "保存帐号",
+                add_to_dashboard: "添加到仪表板",
                 theme_light: "浅色",
                 theme_dark: "深色"
             }
@@ -159,7 +161,8 @@ const i18n = {
             accountsScroll: document.getElementById('accountsScroll'),
             shareBtn: document.getElementById('shareBtn'),
             shareBtnTxt: document.getElementById('shareBtnTxt'),
-            shareFeedback: document.getElementById('shareFeedback')
+            shareFeedback: document.getElementById('shareFeedback'),
+            addToDashboardBtn: document.getElementById('addToDashboardBtn')
         };
 
         const secretInput = document.getElementById('secret');
@@ -208,6 +211,10 @@ const i18n = {
             elements.labelModalSecret.textContent = t.modal_secret;
             elements.closeModalBtn.textContent = t.cancel;
             elements.saveModalBtn.textContent = t.save_account;
+            
+            if (elements.addToDashboardBtn) {
+                elements.addToDashboardBtn.textContent = t.add_to_dashboard;
+            }
             
             langSelect.value = lang;
             
@@ -287,6 +294,12 @@ const i18n = {
 
         // --- Account Management Logic ---
 
+        function updateAccountsState(newAccounts) {
+            accounts = newAccounts;
+            localStorage.setItem('totp-accounts', JSON.stringify(accounts));
+            renderAccounts();
+        }
+
         function renderAccounts() {
             elements.accountsList.innerHTML = '';
             accounts.forEach(acc => {
@@ -340,14 +353,11 @@ const i18n = {
                     refreshTimer = null;
                 }
             }
-            accounts = accounts.filter(a => a.id !== id);
-            localStorage.setItem('totp-accounts', JSON.stringify(accounts));
-            renderAccounts();
+            updateAccountsState(accounts.filter(a => a.id !== id));
         }
 
         function deleteAllAccounts() {
             if (confirm(i18n[currentLang].confirm_delete_all)) {
-                accounts = [];
                 activeAccountId = null;
                 secretInput.value = '';
                 totpCode.textContent = '------';
@@ -358,16 +368,13 @@ const i18n = {
                     clearInterval(refreshTimer);
                     refreshTimer = null;
                 }
-                localStorage.setItem('totp-accounts', JSON.stringify(accounts));
-                renderAccounts();
+                updateAccountsState([]);
             }
         }
 
         function saveAccount(name, secret) {
             const id = Date.now().toString();
-            accounts.push({ id, name, secret });
-            localStorage.setItem('totp-accounts', JSON.stringify(accounts));
-            renderAccounts();
+            updateAccountsState([...accounts, { id, name, secret }]);
             elements.accountModal.classList.remove('show');
         }
 
@@ -389,8 +396,7 @@ const i18n = {
                 try {
                     const imported = JSON.parse(event.target.result);
                     if (Array.isArray(imported)) {
-                        accounts = imported;
-                        localStorage.setItem('totp-accounts', JSON.stringify(accounts));
+                        updateAccountsState(imported);
                         activeAccountId = null;
                         if (accounts.length > 0) {
                             showAccountTotp(accounts[0]);
@@ -399,9 +405,9 @@ const i18n = {
                             totpCode.textContent = '------';
                             elements.shareBtn.classList.add('hidden');
                         }
-                        renderAccounts();
                     }
                 } catch (err) {
+                    console.error("JSON Import Error:", err);
                     alert("Invalid JSON file");
                 }
             };
@@ -443,13 +449,8 @@ const i18n = {
             try {
                 // Open new tab
                 window.open(url, '_blank');
-                // Copy to clipboard
-                await navigator.clipboard.writeText(url);
-                // Feedback
-                elements.shareFeedback.classList.add('show');
-                setTimeout(() => elements.shareFeedback.classList.remove('show'), 2000);
-            } catch (err) {
-                console.error('Share failed', err);
+            } catch (error) {
+                console.error('Share failed', error);
             }
         }
         elements.shareBtn.onclick = shareAccount;
@@ -465,15 +466,57 @@ const i18n = {
             elements.mainDashboard.classList.remove('hidden');
             elements.accountsDashboard.classList.add('hidden');
             elements.shareBtn.classList.add('hidden');
+            if (elements.addToDashboardBtn) {
+                elements.addToDashboardBtn.classList.remove('hidden');
+            }
             elements.aboutSection.classList.remove('hidden'); // Show About section
             fetchTotp();
             refreshTimer = setInterval(updateProgress, 1000);
             updateProgress();
+            
+            if (elements.addToDashboardBtn) {
+                elements.addToDashboardBtn.onclick = () => {
+                    // Pre-fill the modal with the secret so the user can just type a name and save.
+                    // This creates a much better UX than immediately saving a blank name.
+                    const existingAccount = accounts.find(a => a.secret === urlSecret);
+                    
+                    if (!existingAccount) {
+                        elements.modalTitle.textContent = i18n[currentLang].add_to_dashboard;
+                        elements.modalAccountName.value = 'Shared Account';
+                        elements.modalSecret.value = urlSecret;
+                        
+                        // We hijack the saveModalBtn behavior specifically for this import flow
+                        
+                        elements.saveModalBtn.onclick = () => {
+                            const name = elements.modalAccountName.value.trim();
+                            const secret = elements.modalSecret.value.trim();
+                            if (name && secret) {
+                                // Save it to local storage directly without calling saveAccount (which does UI updates)
+                                // We want to force a reload immediately so the URL params are cleared.
+                                const id = Date.now().toString();
+                                accounts.push({ id, name, secret });
+                                localStorage.setItem('totp-accounts', JSON.stringify(accounts));
+                                window.location.href = window.location.pathname; 
+                            }
+                        };
+                        
+                        elements.accountModal.classList.add('show');
+
+                    } else {
+                        // Secret already exists, just return to dashboard to see it
+                        window.location.href = window.location.pathname;
+                    }
+                };
+            }
+
         } else {
             // ACCOUNT MODE: Unified dashboard
             elements.mainDashboard.classList.remove('hidden'); // Always show display
             elements.accountsDashboard.classList.remove('hidden');
             elements.shareBtn.classList.add('hidden'); // Hide until selected
+            if (elements.addToDashboardBtn) {
+                 elements.addToDashboardBtn.classList.add('hidden');
+            }
             elements.aboutSection.classList.remove('hidden');
             renderAccounts();
             if (accounts.length > 0) showAccountTotp(accounts[0]);

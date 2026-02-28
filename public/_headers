@@ -1,0 +1,7 @@
+/*
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'unsafe-inline' https://buttons.github.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-src https://buttons.github.io; base-uri 'none'; form-action 'self'; upgrade-insecure-requests;
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), camera=(), microphone=()

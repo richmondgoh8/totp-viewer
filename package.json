@@ -1,0 +1,27 @@
+{
+  "name": "totp-viewer",
+  "version": "1.0.0",
+  "description": "A modern, premium, and browser-based TOTP (Time-Based One-Time Password) generator and validator, powered by pure **JavaScript** and the browser's native **SubtleCrypto API**.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint public/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/richmondgoh8/totp-viewer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/richmondgoh8/totp-viewer/issues"
+  },
+  "homepage": "https://github.com/richmondgoh8/totp-viewer#readme",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.2",
+    "globals": "^17.3.0"
+  }
+}
