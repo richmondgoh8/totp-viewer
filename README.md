@@ -2,9 +2,13 @@
 
 Welcome to **TOTP Viewer**, a web based Time-Based One-Time Password tool. (NPM Module can be ignored, it is just purely used as a linter to check for errors)
 
+A very tiny project built using some AI.
+
 Users can securely share access using encrypted URL parameters without forcing anyone to download an app or create an account (not using any database, just simple json with local account).
 
 Users can validate TOTP codes against different step windows to see how it behaves and is correct.
+
+The idea is just to put the url with the secret and keep it as a bookmark either to for yourself or to share. For other users, they can also self host to just keep an entire web version which only they can see.
 
 ## Getting Started
 
