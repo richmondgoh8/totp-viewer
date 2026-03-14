@@ -1,13 +1,12 @@
-# TOTP Viewer 🔐
+# TOTP Viewer
 
 Welcome to **TOTP Viewer**, a web based Time-Based One-Time Password tool. (NPM Module can be ignored, it is just purely used as a linter to check for errors)
 
-Features
 Users can securely share access using encrypted URL parameters without forcing anyone to download an app or create an account (not using any database, just simple json with local account).
 
 Users can validate TOTP codes against different step windows to see how it behaves and is correct.
 
-## 🚀 Getting Started
+## Getting Started
 
 If you want to spin this up locally:
 
@@ -23,12 +22,12 @@ npx serve public
 
 Then visit: `http://localhost:3000/?secret=JBSWY3DPEHPK3PXP`
 
-## 🌥️ Deployment
+## Deployment
 
 Deployment is entirely frictionless. The repository is optimized for **Cloudflare Pages**.
 Simply point your Cloudflare deployment to the `/public` directory, and it will effortlessly ingest the `_headers` file and serve your application to the world in seconds.
 
-### 📦 Standalone Binary Release
+### Standalone Binary Release
 
 If you prefer to distribute this tool entirely offline without a web host, you can generate a standalone zip file of the deployment-ready code.
 
